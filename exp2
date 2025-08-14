@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .bank-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .balance-box {
+            background-color: #e0f7e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2d8659;
+            margin-bottom: 25px;
+        }
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .deposit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .deposit-btn:hover {
+            background-color: #218838;
+        }
+        .withdraw-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .withdraw-btn:hover {
+            background-color: #b52a38;
+        }
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .balance-box {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            button {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bank-container">
+        <h1>My Bank</h1>
+        <div class="balance-box">
+            Balance: ₹50,000
+        </div>
+        <div class="btn-container">
+            <button class="deposit-btn">Deposit</button>
+            <button class="withdraw-btn">Withdraw</button>
+        </div>
+    </div>
+</body>
+</html>
