@@ -1,0 +1,95 @@
+// app.js
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+// ---- In-memory seat storage ----
+const seats = {};
+const TOTAL_SEATS = 10;
+
+// Initialize seats
+for (let i = 1; i <= TOTAL_SEATS; i++) {
+  seats[i] = { status: "available", lockedBy: null, lockExpiry: null };
+}
+
+// Utility: check and clear expired locks
+function checkLockExpiry(seatId) {
+  const seat = seats[seatId];
+  if (seat.status === "locked" && seat.lockExpiry && Date.now() > seat.lockExpiry) {
+    seat.status = "available";
+    seat.lockedBy = null;
+    seat.lockExpiry = null;
+  }
+}
+
+// ---- Endpoints ----
+
+// View all seats
+app.get("/seats", (req, res) => {
+  // Before showing, update expired locks
+  Object.keys(seats).forEach(checkLockExpiry);
+  res.json(seats);
+});
+
+// Lock a seat
+app.post("/lock/:seatId", (req, res) => {
+  const seatId = req.params.seatId;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
+  if (!seats[seatId]) {
+    return res.status(404).json({ message: "Seat not found" });
+  }
+
+  checkLockExpiry(seatId);
+  const seat = seats[seatId];
+
+  if (seat.status === "available") {
+    seat.status = "locked";
+    seat.lockedBy = userId;
+    seat.lockExpiry = Date.now() + 60 * 1000; // 1 min lock
+    return res.json({ message: `Seat ${seatId} locked by ${userId} for 1 minute` });
+  } else if (seat.status === "locked") {
+    return res.status(400).json({ message: `Seat ${seatId} is already locked` });
+  } else if (seat.status === "booked") {
+    return res.status(400).json({ message: `Seat ${seatId} is already booked` });
+  }
+});
+
+// Confirm booking
+app.post("/confirm/:seatId", (req, res) => {
+  const seatId = req.params.seatId;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
+  if (!seats[seatId]) {
+    return res.status(404).json({ message: "Seat not found" });
+  }
+
+  checkLockExpiry(seatId);
+  const seat = seats[seatId];
+
+  if (seat.status === "locked" && seat.lockedBy === userId) {
+    seat.status = "booked";
+    seat.lockedBy = null;
+    seat.lockExpiry = null;
+    return res.json({ message: `Seat ${seatId} successfully booked by ${userId}` });
+  } else if (seat.status === "locked" && seat.lockedBy !== userId) {
+    return res.status(403).json({ message: `Seat ${seatId} is locked by another user` });
+  } else if (seat.status === "booked") {
+    return res.status(400).json({ message: `Seat ${seatId} is already booked` });
+  } else {
+    return res.status(400).json({ message: `Seat ${seatId} is not locked, cannot confirm booking` });
+  }
+});
+
+// ---- Start server ----
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
